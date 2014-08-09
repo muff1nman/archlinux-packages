@@ -121,6 +121,9 @@ package() {
   mkdir -p \
     "$pkgdir/"{etc/profile.d,usr/{share/go,lib/go,lib/go/src,lib/go/site/src}}
 
+  echo "export GOROOT='/usr/lib/go'" > "$pkgdir/etc/profile.d/go.sh"
+  chmod 755 "$pkgdir/etc/profile.d/go.sh"
+
   cp -r doc misc -t "$pkgdir/usr/share/go"
   ln -s /usr/share/go/doc "$pkgdir/usr/lib/go/doc"
   cp -a bin "$pkgdir/usr"
