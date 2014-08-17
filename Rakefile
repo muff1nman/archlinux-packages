@@ -6,7 +6,7 @@ IGNORE = ['build']
 
 def add_package_to_db pkg
   puts "Adding #{pkg} to #{DB_FILE}"
-  `repo-add --key F8364EDF --sign --verify #{DB_FILE} #{pkg}`
+  `repo-add -f --key F8364EDF --sign #{DB_FILE} #{pkg}`
 end
 
 def built_pkg_files dir
