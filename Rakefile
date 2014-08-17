@@ -75,8 +75,10 @@ task :build do
   end
 end
 
-task :updatedb => [:cleandb] do
-
+task :upload => :build do
+  Dir.chdir BUILD_DIR do
+    `s3cmd sync . s3://repo.andrewdemaria.com/archlinux/`
+  end
 end
 
 task :cleandb do
