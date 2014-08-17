@@ -9,12 +9,11 @@ def add_package_to_db pkg
   `repo-add --key F8364EDF --sign --verify #{DB_FILE} #{pkg}`
 end
 
-def built_pkg_file dir
+def built_pkg_files dir
   puts "Finding built pkg in #{dir}"
-  pkgs = Dir.glob("#{dir}/*.pkg.tar.xz")
+  pkgs = Dir.glob("#{dir}/*.pkg.tar.xz") + Dir.glob("{dir}/*.pkg.tar.xz.sig")
   puts "The list #{pkgs}"
-  return nil unless pkgs.size == 1
-  pkgs[0]
+  pkgs
 end
 
 def ensure_build_dir_present
@@ -22,25 +21,46 @@ def ensure_build_dir_present
 end
 
 def export_package dir
-  pkg = built_pkg_file dir
-  new_pkg = File.join(BUILD_DIR,File.basename(pkg))
-  puts "Exporting #{pkg} to #{new_pkg}"
   ensure_build_dir_present
-  FileUtils.cp(pkg,new_pkg)
-  add_package_to_db new_pkg
+  do_with_pkgs_in(dir,true) do |pkg|
+    new_pkg = File.join(BUILD_DIR,File.basename(pkg))
+    puts "Exporting #{pkg} to #{new_pkg}"
+    FileUtils.cp(pkg,new_pkg)
+    add_package_to_db new_pkg
+  end
+end
+
+def do_with_pkgs_in dir, abort_on_error, &block
+  do_with_pkg_list( built_pkg_files(dir), abort_on_error, &block )
+end
+
+def do_with_pkg_list pkg_list, abort_on_error, &block
+  case pkg_list
+  when Array
+    case pkg_list.size
+    when 0
+      # error case to be handled later...
+    else
+      pkg_list.each{|pkg| yield pkg }
+      return
+    end
+  when String
+    yield pkg_list
+    return
+  end
+  abort "Cannot operate on #{pkg_list} as package list" if abort_on_error
 end
 
 def build_package dir
   puts "Building #{dir}"
   Dir.chdir dir do
-    `makepkg --key F8364EDF --sign`
+    `makepkg -sr --key F8364EDF --sign`
   end
 end
 
 def clean_package dir
   puts "Finding old packages in dir #{dir}"
-  old_pkg = built_pkg_file dir
-  unless old_pkg.nil?
+  do_with_pkgs_in(dir,false) do |old_pkg|
     puts "Removing old package #{old_pkg}"
     FileUtils.rm(old_pkg)
   end
