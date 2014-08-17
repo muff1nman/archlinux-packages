@@ -10,10 +10,7 @@ def add_package_to_db pkg
 end
 
 def built_pkg_files dir
-  puts "Finding built pkg in #{dir}"
-  pkgs = Dir.glob("#{dir}/*.pkg.tar.xz") + Dir.glob("{dir}/*.pkg.tar.xz.sig")
-  puts "The list #{pkgs}"
-  pkgs
+  Dir.glob("#{dir}/*.pkg.tar.xz")
 end
 
 def ensure_build_dir_present
@@ -26,6 +23,7 @@ def export_package dir
     new_pkg = File.join(BUILD_DIR,File.basename(pkg))
     puts "Exporting #{pkg} to #{new_pkg}"
     FileUtils.cp(pkg,new_pkg)
+    FileUtils.cp("#{pkg}.sig","#{new_pkg}.sig")
     add_package_to_db new_pkg
   end
 end
@@ -62,11 +60,12 @@ def clean_package dir
   puts "Finding old packages in dir #{dir}"
   do_with_pkgs_in(dir,false) do |old_pkg|
     puts "Removing old package #{old_pkg}"
-    FileUtils.rm(old_pkg)
+    FileUtils.rm_f(old_pkg)
+    FileUtils.rm_f("#{old_pkg}.sig")
   end
 end
 
-task :build do
+task :build => :cleandb do
   puts "Building all packages"
   Dir.glob('*').keep_if { |entry| File.directory? entry and !IGNORE.include? entry }.each do |dir|
     clean_package dir
