@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'kramdown'
 
 BUILD_DIR = 'build'
 DB_FILE = File.join(BUILD_DIR,'muff1nman.db.tar.gz')
@@ -74,9 +75,22 @@ task :build => :cleandb do
   end
 end
 
-task :upload => :build do
+task :index do
   Dir.chdir BUILD_DIR do
-    `s3cmd sync . s3://repo.andrewdemaria.com/archlinux/`
+    markdown_content = Dir
+      .glob('*')
+      .reject { |item| item.eql? "index.html" }
+      .sort
+      .map { |item| "[#{item}](#{item})" }
+      .join "\n\n"
+    index_content = Kramdown::Document.new(markdown_content).to_html
+    File.open('index.html', 'w') { |file| file.write index_content }
+  end
+end
+
+task :upload do
+  Dir.chdir BUILD_DIR do
+    `s3cmd sync -F --delete-removed . s3://repo.andrewdemaria.com/archlinux/`
   end
 end
 
