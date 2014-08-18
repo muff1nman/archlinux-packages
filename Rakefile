@@ -66,9 +66,18 @@ def clean_package dir
   end
 end
 
-task :build => :cleandb do
-  puts "Building all packages"
-  Dir.glob('*').keep_if { |entry| File.directory? entry and !IGNORE.include? entry }.each do |dir|
+task :build, :pkg_list do |t,args|
+  buildpkgs args[:pkg_list]
+end
+
+def buildpkgs pkg_list="*"
+  pkg_list = "*" if pkg_list.nil?
+  if pkg_list == "*"
+    puts "Building all packages"
+  else
+    puts "Building #{pkg_list}"
+  end
+  Dir.glob(pkg_list).keep_if { |entry| File.directory? entry and !IGNORE.include? entry }.each do |dir|
     clean_package dir
     build_package dir
     export_package dir
@@ -90,10 +99,15 @@ end
 
 task :upload do
   Dir.chdir BUILD_DIR do
-    `s3cmd sync -F --delete-removed . s3://repo.andrewdemaria.com/archlinux/`
+    exec "s3cmd sync -F --delete-removed . s3://repo.andrewdemaria.com/archlinux/"
   end
 end
 
 task :cleandb do
+  puts "Removing database file"
   FileUtils.rm_f(DB_FILE)
+end
+
+task :clean do
+  `git clean -fxd`
 end
