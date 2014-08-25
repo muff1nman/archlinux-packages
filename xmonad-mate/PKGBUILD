@@ -1,0 +1,16 @@
+# Maintainer: Andrew DeMaria <lostonamountain@gmail.com>
+pkgname=xmonad-mate
+pkgver=0.1
+pkgrel=1
+pkgdesc="Desktop files for xmonad combined with mate"
+arch=('any')
+url="https://github.com/muff1nman/archlinux-packages"
+source=("xmonad.desktop" "xmonad-mate.desktop")
+md5sums=('95362fb349aebbdb27630c40d0aa9e7b'
+         'ae987c71533ed1190595c035d5085ced')
+license=('MIT')
+
+package() {
+	install -Dm644 xmonad.desktop "$pkgdir/usr/share/applications/xmonad.desktop"
+	install -Dm644 xmonad-mate.desktop "$pkgdir/usr/share/xsessions/xmonad-mate.desktop"
+}
