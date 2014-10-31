@@ -1,7 +1,7 @@
 # Maintainer: Sebastien Bariteau <numkem@numkem.org>
 # Contributor: Justin Dray <justin@dray.be>
 pkgname="google-cloud-sdk"
-pkgver=0.9.33
+pkgver=0.9.34
 pkgrel=1
 pkgdesc="Contains tools and libraries that enable you to easily create and manage resources on Google Cloud Platform"
 url="https://developers.google.com/cloud/sdk/"
@@ -11,7 +11,10 @@ source=("$pkgname-$pkgver.tar.gz::https://dl.google.com/dl/cloudsdk/release/goog
         "profile.sh")
 depends=('python2')
 makedepends=('python2')
-md5sums=('1aa5b826bc3533766922ac239e0df514'
+optdepends=('go: for Go version of App Engine'
+            'java-environment: for Java version of App Engine'
+            'php: for PHP version of App Engine')
+md5sums=('388bd838895367c9dd85933ec3b2be80'
          'd7c7ccb7d32a871d67288228f5b4cd94')
 options=('!strip' 'staticlibs')
 
@@ -28,7 +31,7 @@ package() {
 		--usage-reporting false --disable-installation-options \
 		--path-update false --bash-completion true --rc-path="$srcdir"/fake.bashrc
 	install -Dm755 "$pkgdir"/opt/google-cloud-sdk/completion.bash.inc "$pkgdir"/etc/bash_completion.d/google-cloud-sdk
-	install -Dm755 "$srcdir"/profile.sh "$pkgdir"/etc/profile.d/google-cloud-sdk
+	install -Dm755 "$srcdir"/profile.sh "$pkgdir"/etc/profile.d/google-cloud-sdk.sh
 
 	msg2 "Fixing python references..."
 	grep -rl 'python' "$pkgdir/opt/$pkgname" | xargs sed -i 's|#!.*python\b|#!/usr/bin/env python2|g'
