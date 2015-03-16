@@ -7,7 +7,7 @@ IGNORE = ['build' 'thirdparty']
 
 def add_package_to_db pkg
   puts "Adding #{pkg} to #{DB_FILE}"
-  `repo-add -f --key F8364EDF --sign #{DB_FILE} #{pkg}`
+  exit unless system "repo-add -f --key F8364EDF --sign #{DB_FILE} #{pkg}"
 end
 
 def built_pkg_files dir
@@ -53,7 +53,7 @@ end
 def build_package dir
   puts "Building #{dir}"
   Dir.chdir dir do
-    `makepkg -sr --key F8364EDF --sign`
+    exit unless system "makepkg -sr --key F8364EDF --sign"
   end
 end
 
@@ -77,8 +77,8 @@ def buildpkgs pkg_list="*"
   else
     puts "Building #{pkg_list}"
   end
+  prep_build_dir
   Dir.glob(pkg_list).keep_if { |entry| File.directory? entry and !IGNORE.include? entry }.each do |dir|
-    clean_package dir
     build_package dir
     export_package dir
   end
@@ -97,9 +97,20 @@ task :index do
   end
 end
 
+task :download do
+  prep_build_dir
+end
+
+def prep_build_dir
+  ensure_build_dir_present
+  Dir.chdir BUILD_DIR do
+    exit unless system "s3cmd get -r -F --check-md5 --skip-existing s3://repo.andrewdemaria.com/archlinux/ ."
+  end
+end
+
 task :upload do
   Dir.chdir BUILD_DIR do
-    exec "s3cmd sync -F --delete-removed . s3://repo.andrewdemaria.com/archlinux/"
+    exec "s3cmd sync -r -F --delete-removed . s3://repo.andrewdemaria.com/archlinux/"
   end
 end
 
@@ -109,5 +120,5 @@ task :cleandb do
 end
 
 task :clean do
-  `git clean -fxd`
+  exit unless system "git clean -fxd"
 end
