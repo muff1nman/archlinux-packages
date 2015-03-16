@@ -53,7 +53,7 @@ end
 def build_package dir
   puts "Building #{dir}"
   Dir.chdir dir do
-    exit unless system "makepkg -sr --key F8364EDF --sign"
+    exit unless system "makepkg -f -sr --key F8364EDF --sign"
   end
 end
 
