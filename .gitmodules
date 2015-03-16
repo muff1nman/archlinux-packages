@@ -1,0 +1,3 @@
+[submodule "thirdparty/WarheadsSE"]
+	path = thirdparty/WarheadsSE
+	url = https://github.com/WarheadsSE/PKGs.git

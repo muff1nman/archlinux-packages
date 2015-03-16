@@ -3,7 +3,7 @@ require 'kramdown'
 
 BUILD_DIR = 'build'
 DB_FILE = File.join(BUILD_DIR,'muff1nman.db.tar.gz')
-IGNORE = ['build']
+IGNORE = ['build' 'thirdparty']
 
 def add_package_to_db pkg
   puts "Adding #{pkg} to #{DB_FILE}"
