@@ -1,0 +1,42 @@
+# This is an example PKGBUILD file. Use this as a start to creating your own,
+# and remove these comments. For more information, see 'man PKGBUILD'.
+# NOTE: Please fill out the license field for your package! If it is unknown,
+# then please put 'unknown'.
+
+
+# Maintainer: Andrew DeMaria <lostonamountain@gmail.com>
+pkgname=sensu-git
+pkgrel=1
+pkgdesc=""
+arch=(any)
+url=""
+license=('MIT')
+groups=()
+depends=(ruby) # Full dependency information is available in the yaml specification
+makedepends=(rubygems)
+makedepends=('git')
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+source=(https://github.com/muff1nman/sensu.git)
+noextract=()
+md5sums=('SKIP')
+
+_gitroot=GITURL
+_gitname=MODENAME
+
+pkgver() {
+  cd "$pkgname"
+  git describe --long  | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+package() {
+  cd "$srcdir"
+  local _gemdir="$(ruby -rubygems -e'puts Gem.default_dir')"
+  gem install --no-user-install --ignore-dependencies -i "$pkgdir$_gemdir" -n "$pkgdir/usr/bin" "$_gemname-$pkgver.gem"
+}
+
+# vim:set ts=2 sw=2 et:
