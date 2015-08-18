@@ -9,11 +9,11 @@ _prevpkgbase=vim
 pkgname=("vim-rdy" "gvim-rdy" "vim-runtime-rdy")
 _prevpkgname=("vim" "gvim" "vim-runtime")
 _topver=7.4
-_patchlevel=617
-_tag=v${_topver/./-}-${_patchlevel}
+_patchlevel=778
+_tag=v${_topver}.${_patchlevel}
 _versiondir="vim${_topver//./}"
 pkgver=${_topver}.${_patchlevel}
-pkgrel=2
+pkgrel=6
 arch=('i686' 'x86_64')
 license=('custom:vim')
 url="http://www.vim.org"
@@ -29,6 +29,7 @@ source=("${pkgbase}-repo::hg+https://vim.googlecode.com/hg#tag=${_tag}"
         'git+https://github.com/vhdirk/vim-cmake.git'
         'git+https://github.com/kchmck/vim-coffee-script.git'
         'git+https://github.com/wincent/Command-T.git'
+        'git+https://github.com/tpope/vim-cucumber'
         'git://github.com/tomtom/vimball.rb.git'
         'git://github.com/tomtom/vimscriptuploader.rb.git'
         'git://github.com/scrooloose/nerdcommenter.git'
@@ -59,11 +60,14 @@ source=("${pkgbase}-repo::hg+https://vim.googlecode.com/hg#tag=${_tag}"
         'git+https://github.com/slezica/python-frozendict'
         'git+https://github.com/davidhalter/jedi'
         'git+https://github.com/Pylons/waitress'
+        'git+https://github.com/junegunn/vim-easy-align'
         )
 md5sums=('SKIP'
          'b9d4dcb9d3ee2e151dc4be1e94934f6a'
          'f3c8931847a12949bdd14c9d48fdabb3'
          'd90413bd21f400313a785bb4010120cd'
+         'SKIP'
+         'SKIP'
          'SKIP'
          'SKIP'
          'SKIP'
@@ -114,6 +118,12 @@ prepare() {
   git submodule init vim/bundle/command-t
   git config submodule.vim/bundle/command-t.url "$srcdir/Command-T"
   git submodule update vim/bundle/command-t
+  git submodule init vim/bundle/vim-easy-align
+  git config submodule.vim/bundle/vim-easy-align.url "$srcdir/vim-easy-align"
+  git submodule update vim/bundle/vim-easy-align
+  git submodule init vim/bundle/vim-cucumber
+  git config submodule.vim/bundle/vim-cucumber.url "$srcdir/vim-cucumber"
+  git submodule update vim/bundle/vim-cucumber
   pushd vim/bundle/command-t
   git submodule init vendor/vimball
   git config submodule.vendor/vimball.url "$srcdir/vimball.rb"
@@ -250,10 +260,10 @@ build() {
     --enable-multibyte \
     --enable-cscope \
     --disable-netbeans \
-    --enable-perlinterp \
+    --disable-perlinterp \
     --disable-pythoninterp \
     --disable-python3interp \
-    --enable-rubyinterp \
+    --enable-rubyinterp=dynamic \
     --disable-luainterp
 
   make
@@ -273,11 +283,11 @@ build() {
     --enable-multibyte \
     --enable-cscope \
     --disable-netbeans \
-    --enable-perlinterp \
-    --enable-pythoninterp \
+    --disable-perlinterp \
+    --enable-pythoninterp=dynamic \
     --disable-python3interp \
-    --enable-rubyinterp \
-    --enable-luainterp
+    --enable-rubyinterp=dynamic \
+    --enable-luainterp=dynamic
 
   make
 
@@ -295,11 +305,11 @@ build() {
     --enable-multibyte \
     --enable-cscope \
     --enable-netbeans \
-    --enable-perlinterp \
-    --enable-pythoninterp \
+    --disable-perlinterp \
+    --enable-pythoninterp=dynamic \
     --disable-python3interp \
-    --enable-rubyinterp \
-    --enable-luainterp
+    --enable-rubyinterp=dynamic \
+    --enable-luainterp=dynamic
 
   make
 
